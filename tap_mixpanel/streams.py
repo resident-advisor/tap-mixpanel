@@ -284,6 +284,7 @@ class MixPanel:
         project_timezone = config.get("project_timezone", "UTC")
         days_interval = int(config.get("date_window_size", "30"))
         attribution_window = int(config.get("attribution_window", "5"))
+        include_ids = config.get("include_ids", None)
 
         #Update url if eu_residency is selected
         if str(config.get('eu_residency')).lower() == "true":
@@ -355,6 +356,10 @@ class MixPanel:
 
             for parent_record in parent_data:
                 parent_id = parent_record.get(self.parent_id_field)
+                if include_ids and not parent_id in include_ids:
+                    LOGGER.warning('SKIP: Stream: %s, parent_id: %s', self.tap_stream_id, parent_id)
+                    continue
+
                 LOGGER.info('START: Stream: %s, parent_id: %s', self.tap_stream_id, parent_id)
 
                 # pagination: loop thru all pages of data using next (if not None)
